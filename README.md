@@ -40,7 +40,7 @@
 
 ## 🚀 Live Demo
 
-**[Launch Termify →](https://digimarketingai.github.io/termify-glossary-viewer/)**
+**[Launch Termify - Glossary Viewer →](https://digimarketingai.github.io/termify-glossary-viewer/)**
 
 ---
 
@@ -48,7 +48,7 @@
 
 ### Quick Start
 
-1. **Open** the [Termify app](https://digimarketingai.github.io/termify-glossary-viewer/)
+1. **Open** the [Termify - Glossary Viewer app](https://digimarketingai.github.io/termify-glossary-viewer/)
 2. **Drag & drop** your CSV file (or click to browse)
 3. **Search, filter, and sort** your terminology
 4. **Click any term** to enlarge and view details
