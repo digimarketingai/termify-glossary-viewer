@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 遊戲本地化工作坊：三國全軍破敵 | Game Localization Lab</title>
+    <style>
+        /* ============================================
+           CSS VARIABLES & RESET
+        ============================================ */
+        :root {
+            --primary-color: #8B0000;
+            --primary-dark: #5c0000;
+            --primary-light: #b22222;
+            --secondary-color: #DAA520;
+            --gold: #FFD700;
+            --bg-dark: #1a1a1a;
+            --bg-medium: #2d2d2d;
+            --bg-light: #3d3d3d;
+            --text-light: #f5f5f5;
+            --text-muted: #aaa;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.3);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', 'Microsoft JhengHei', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           NAVIGATION
+        ============================================ */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 100%);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 0;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--gold);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo span {
+            color: var(--text-light);
+            font-weight: normal;
+            font-size: 0.9rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* ============================================
+           HERO SECTION
+        ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: 
+                linear-gradient(135deg, rgba(139,0,0,0.3) 0%, rgba(0,0,0,0.7) 50%, rgba(218,165,32,0.2) 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            background-size: cover;
+            padding: 100px 20px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.5) 100%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 8px 25px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            border: 1px solid var(--gold);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--gold) 0%, #fff 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(255,215,0,0.3);
+        }
+
+        .hero h2 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: 2px solid var(--gold);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(139,0,0,0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--gold);
+            border: 2px solid var(--gold);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gold);
+            color: var(--bg-dark);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-15px); }
+            60% { transform: translateX(-50%) translateY(-8px); }
+        }
+
+        /* ============================================
+           SECTIONS
+        ============================================ */
+        section {
+            padding: 80px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           ERROR TYPE CARDS
+        ============================================ */
+        .error-types {
+            display: grid;
+            gap: 40px;
+        }
+
+        .error-card {
+            background: var(--bg-medium);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .error-card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .error-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .error-card-title h3 {
+            font-size: 1.3rem;
+            color: white;
+            margin-bottom: 3px;
+        }
+
+        .error-card-title span {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .error-table-container {
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        .error-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .error-table th {
+            background: var(--bg-light);
+            padding: 15px 20px;
+            text-align: left;
+            color: var(--gold);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .error-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: top;
+        }
+
+        .error-table tr:hover td {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .error-table .col-english {
+            color: var(--info);
+            font-weight: 500;
+        }
+
+        .error-table .col-wrong {
+            color: var(--error);
+        }
+
+        .error-table .col-problem {
+            font-size: 0.85rem;
+            color: var(--warning);
+        }
+
+        .error-table .col-correct {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .emoji-tag {
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
+
+        /* ============================================
+           TERMINOLOGY SECTION
+        ============================================ */
+        .terminology-section {
+            background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-medium) 100%);
+        }
+
+        .term-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .term-card {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .term-card-header {
+            background: linear-gradient(135deg, var(--secondary-color), #b8860b);
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .term-card-header h3 {
+            color: var(--bg-dark);
+            font-size: 1.2rem;
+        }
+
+        .term-card-header span {
+            font-size: 1.5rem;
+        }
+
+        .term-list {
+            padding: 15px;
+        }
+
+        .term-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .term-table th {
+            background: rgba(0,0,0,0.3);
+            padding: 12px 15px;
+            text-align: left;
+            color: var(--gold);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .term-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+
+        .term-table tr:hover td {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .term-english {
+            color: var(--info);
+        }
+
+        .term-chinese {
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        .term-notes {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* ============================================
+           INTERACTIVE QUIZ
+        ============================================ */
+        .quiz-section {
+            background: var(--bg-dark);
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quiz-card {
+            background: var(--bg-medium);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--primary-color);
+        }
+
+        .quiz-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .quiz-progress-text {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .quiz-progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            margin-left: 20px;
+            overflow: hidden;
+        }
+
+        .quiz-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--gold));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .quiz-question {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-question-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .quiz-question-text {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            padding: 25px;
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--gold);
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .quiz-option {
+            padding: 18px 25px;
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            font-size: 1rem;
+            color: var(--text-light);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--gold);
+            transform: translateX(5px);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--info);
+            background: rgba(52,152,219,0.1);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: rgba(46,204,113,0.1);
+        }
+
+        .quiz-option.wrong {
+            border-color: var(--error);
+            background: rgba(231,76,60,0.1);
+        }
+
+        .quiz-feedback {
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(46,204,113,0.15);
+            border: 1px solid var(--success);
+        }
+
+        .quiz-feedback.wrong {
+            background: rgba(231,76,60,0.15);
+            border: 1px solid var(--error);
+        }
+
+        .quiz-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .quiz-result {
+            text-align: center;
+            display: none;
+        }
+
+        .quiz-result.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .quiz-score {
+            font-size: 4rem;
+            color: var(--gold);
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+
+        .quiz-score-text {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================
+           TIPS SECTION
+        ============================================ */
+        .tips-section {
+            background: linear-gradient(135deg, var(--bg-medium) 0%, var(--bg-dark) 100%);
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .tip-card {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--gold);
+            transition: var(--transition);
+        }
+
+        .tip-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tip-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .tip-card h3 {
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .tip-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ============================================
+           FOOTER
+        ============================================ */
+        footer {
+            background: var(--bg-dark);
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--gold);
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+        ============================================ */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(0,0,0,0.95);
+                flex-direction: column;
+                padding: 20px;
+                gap: 10px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .error-table {
+                font-size: 0.85rem;
+            }
+
+            .error-table th,
+            .error-table td {
+                padding: 10px 12px;
+            }
+
+            .quiz-card {
+                padding: 25px;
+            }
+
+            .quiz-question-text {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* ============================================
+           ANIMATIONS
+        ============================================ */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+        ============================================ */
+        .text-center { text-align: center; }
+        .mb-20 { margin-bottom: 20px; }
+        .mb-40 { margin-bottom: 40px; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                🎮 遊戲本地化工作坊 <span>| Game Localization Lab</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#errors">MT錯誤類型</a></li>
+                <li><a href="#terminology">術語庫</a></li>
+                <li><a href="#quiz">互動測驗</a></li>
+                <li><a href="#tips">實用技巧</a></li>
+            </ul>
+            <button class="nav-toggle" id="navToggle">☰</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content fade-in-up">
+            <div class="hero-badge">📚 專業遊戲翻譯培訓課程</div>
+            <h1>🎮 三國全軍破敵</h1>
+            <h2>Total War: Three Kingdoms Localization Workshop</h2>
+            <p class="hero-description">
+                學習如何避免機器翻譯的常見錯誤，掌握專業遊戲本地化技巧，
+                讓您的翻譯不只是正確，更要有古風古韻！
+            </p>
+            <div class="hero-buttons">
+                <a href="#errors" class="btn btn-primary">
+                    <span>開始學習</span> →
+                </a>
+                <a href="#quiz" class="btn btn-secondary">
+                    <span>📝 互動測驗</span>
+                </a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span style="color: var(--gold); font-size: 2rem;">↓</span>
+        </div>
+    </section>
+
+    <!-- Part 1: MT Error Types -->
+    <section id="errors">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <div class="section-badge">📚 Part 1</div>
+                <h2 class="section-title">為什麼機器翻譯不夠好？</h2>
+                <p class="section-subtitle">Why MT Isn't Enough? — 常見機器翻譯錯誤類型分析</p>
+            </div>
+
+            <div class="error-types">
+                <!-- Error Type 1 -->
+                <div class="error-card fade-in-up">
+                    <div class="error-card-header">
+                        <div class="error-icon">💥</div>
+                        <div class="error-card-title">
+                            <h3>錯誤類型一：直譯災難</h3>
+                            <span>Error Type 1: Literal Translation Disasters</span>
+                        </div>
+                    </div>
+                    <div class="error-table-container">
+                        <table class="error-table">
+                            <thead>
+                                <tr>
+                                    <th>English Original</th>
+                                    <th>❌ MT Translation</th>
+                                    <th>Problem 問題</th>
+                                    <th>✅ Proper Localization</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="col-english">"Hold the line!"</td>
+                                    <td class="col-wrong">握住那條線！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>Sounds like holding a rope!</td>
+                                    <td class="col-correct">堅守陣地！/ 死守防線！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">"Charge!"</td>
+                                    <td class="col-wrong">充電！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>Like charging a phone!</td>
+                                    <td class="col-correct">衝啊！/ 殺！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">"Break their ranks!"</td>
+                                    <td class="col-wrong">打破他們的等級！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>"Break their social class"??</td>
+                                    <td class="col-correct">衝散敵陣！/ 破其陣勢！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">"Fall back!"</td>
+                                    <td class="col-wrong">往後跌倒！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>"Fall down backwards"!</td>
+                                    <td class="col-correct">撤退！/ 退！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">"Loose!" (arrows)</td>
+                                    <td class="col-wrong">鬆開！/ 放鬆！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>"Relax!" to archers??</td>
+                                    <td class="col-correct">放箭！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">"Rout the enemy!"</td>
+                                    <td class="col-wrong">路由敵人！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>IT terminology??</td>
+                                    <td class="col-correct">擊潰敵軍！/ 殺他個片甲不留！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">"Fire at will!"</td>
+                                    <td class="col-wrong">向威爾開火！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>Who is Will??</td>
+                                    <td class="col-correct">自由射擊！/ 放箭！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">"They're flanking us!"</td>
+                                    <td class="col-wrong">他們在側翼我們！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>"Flanking" as verb??</td>
+                                    <td class="col-correct">敵人從側翼包抄！/ 有埋伏！</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Error Type 2 -->
+                <div class="error-card fade-in-up">
+                    <div class="error-card-header">
+                        <div class="error-icon">🏯</div>
+                        <div class="error-card-title">
+                            <h3>錯誤類型二：太西方、不夠中國味</h3>
+                            <span>Error Type 2: Too Western, Not Chinese Enough</span>
+                        </div>
+                    </div>
+                    <div class="error-table-container">
+                        <table class="error-table">
+                            <thead>
+                                <tr>
+                                    <th>❌ Western Style 西式翻譯</th>
+                                    <th>Problem 問題</th>
+                                    <th>✅ Chinese Drama Style 中式古風</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="col-wrong">士兵們，為了榮耀而戰！</td>
+                                    <td class="col-problem">Too generic, sounds like a Western knight</td>
+                                    <td class="col-correct">兒郎們！隨我殺敵報國！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">我們會贏的！</td>
+                                    <td class="col-problem">Boring, no dramatic flair</td>
+                                    <td class="col-correct">今日不破敵軍，誓不還營！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">你是個壞人！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>Like a children's show</td>
+                                    <td class="col-correct">亂臣賊子，人人得而誅之！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">我很生氣！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>Too simple, no gravitas</td>
+                                    <td class="col-correct">是可忍，孰不可忍！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">我們是朋友</td>
+                                    <td class="col-problem">Modern, not period-appropriate</td>
+                                    <td class="col-correct">你我肝膽相照，情同手足！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">我不怕你</td>
+                                    <td class="col-problem">Flat, no intimidation</td>
+                                    <td class="col-correct">吾視汝如草芥！/ 爾等鼠輩，何足道哉！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">攻擊他們！</td>
+                                    <td class="col-problem">Too plain</td>
+                                    <td class="col-correct">殺無赦！/ 給我殺！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">我是最強的</td>
+                                    <td class="col-problem">Generic boasting</td>
+                                    <td class="col-correct">天下英雄，捨我其誰！</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Error Type 3 -->
+                <div class="error-card fade-in-up">
+                    <div class="error-card-header">
+                        <div class="error-icon">🎭</div>
+                        <div class="error-card-title">
+                            <h3>錯誤類型三：語氣/語域錯誤</h3>
+                            <span>Error Type 3: Register Mismatch</span>
+                        </div>
+                    </div>
+                    <div class="error-table-container">
+                        <table class="error-table">
+                            <thead>
+                                <tr>
+                                    <th>Character 角色</th>
+                                    <th>❌ Wrong Register 錯誤語氣</th>
+                                    <th>Why Wrong 問題所在</th>
+                                    <th>✅ Correct Register 正確語氣</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="col-english">軍師 Strategist</td>
+                                    <td class="col-wrong">殺殺殺！</td>
+                                    <td class="col-problem">Too aggressive for a scholar</td>
+                                    <td class="col-correct">將軍，敵軍陣型已亂，此乃天賜良機！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">猛將 Warrior</td>
+                                    <td class="col-wrong">讓我們仔細分析一下敵人的弱點</td>
+                                    <td class="col-problem">Too intellectual for Lu Bu!</td>
+                                    <td class="col-correct">廢話少說！來戰！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">皇帝 Emperor</td>
+                                    <td class="col-wrong">兄弟們衝啊！</td>
+                                    <td class="col-problem">Too casual for royalty</td>
+                                    <td class="col-correct">朕命爾等，蕩平賊寇！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-english">士兵 Soldier</td>
+                                    <td class="col-wrong">本將軍認為...</td>
+                                    <td class="col-problem">Soldier using general's speech</td>
+                                    <td class="col-correct">得令！/ 遵命！</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Error Type 4 -->
+                <div class="error-card fade-in-up">
+                    <div class="error-card-header">
+                        <div class="error-icon">📜</div>
+                        <div class="error-card-title">
+                            <h3>錯誤類型四：歷史/文化錯誤</h3>
+                            <span>Error Type 4: Historical/Cultural Errors</span>
+                        </div>
+                    </div>
+                    <div class="error-table-container">
+                        <table class="error-table">
+                            <thead>
+                                <tr>
+                                    <th>❌ Error 錯誤</th>
+                                    <th>Problem 問題</th>
+                                    <th>✅ Correction 更正</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="col-wrong">用火槍攻擊！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>No guns in Three Kingdoms era!</td>
+                                    <td class="col-correct">弓弩手，放箭！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">為上帝而戰！</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>Western religion!</td>
+                                    <td class="col-correct">天命所歸，替天行道！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">騎士們，衝鋒！</td>
+                                    <td class="col-problem">"Knights" is European</td>
+                                    <td class="col-correct">鐵騎兒郎，隨我衝鋒！</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">王子殿下</td>
+                                    <td class="col-problem">Wrong title system</td>
+                                    <td class="col-correct">公子 / 世子 / 殿下</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-wrong">總統大人</td>
+                                    <td class="col-problem"><span class="emoji-tag">😂</span>Modern politics!</td>
+                                    <td class="col-correct">主公 / 陛下 / 丞相</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Part 2: Terminology -->
+    <section id="terminology" class="terminology-section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <div class="section-badge">📚 Part 2</div>
+                <h2 class="section-title">術語庫建立</h2>
+                <p class="section-subtitle">Terminology Base Building — 遊戲本地化必備詞彙</p>
+            </div>
+
+            <div class="term-categories">
+                <!-- Military Terms -->
+                <div class="term-card fade-in-up">
+                    <div class="term-card-header">
+                        <span>⚔️</span>
+                        <h3>軍事術語 Military Terms</h3>
+                    </div>
+                    <div class="term-list">
+                        <table class="term-table">
+                            <thead>
+                                <tr>
+                                    <th>English</th>
+                                    <th>繁體中文</th>
+                                    <th>備註</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="term-english">Heavy Infantry</td>
+                                    <td class="term-chinese">重步兵</td>
+                                    <td class="term-notes">披甲步卒</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Light Cavalry</td>
+                                    <td class="term-chinese">輕騎兵</td>
+                                    <td class="term-notes">斥候騎兵</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Crossbowmen</td>
+                                    <td class="term-chinese">弩兵</td>
+                                    <td class="term-notes">可用「弓弩手」</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Vanguard</td>
+                                    <td class="term-chinese">先鋒</td>
+                                    <td class="term-notes">前軍、前部</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Strategist</td>
+                                    <td class="term-chinese">軍師</td>
+                                    <td class="term-notes">謀士、參謀</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Champion/Warrior</td>
+                                    <td class="term-chinese">猛將</td>
+                                    <td class="term-notes">勇將、虎將</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Commander</td>
+                                    <td class="term-chinese">統帥/主帥</td>
+                                    <td class="term-notes">大將</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Retinue</td>
+                                    <td class="term-chinese">部曲</td>
+                                    <td class="term-notes">親兵、私兵</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Formation</td>
+                                    <td class="term-chinese">陣型/陣法</td>
+                                    <td class="term-notes">八陣圖、魚鱗陣</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Morale</td>
+                                    <td class="term-chinese">士氣</td>
+                                    <td class="term-notes">軍心</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Siege</td>
+                                    <td class="term-chinese">攻城</td>
+                                    <td class="term-notes">圍城</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Ambush</td>
+                                    <td class="term-chinese">埋伏/伏兵</td>
+                                    <td class="term-notes">設伏</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Reinforcements</td>
+                                    <td class="term-chinese">援軍</td>
+                                    <td class="term-notes">救兵</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Retreat</td>
+                                    <td class="term-chinese">撤退</td>
+                                    <td class="term-notes">退兵、班師</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Flank attack</td>
+                                    <td class="term-chinese">側翼包抄</td>
+                                    <td class="term-notes">夾擊</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Supply line</td>
+                                    <td class="term-chinese">糧道</td>
+                                    <td class="term-notes">補給線</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Character Titles -->
+                <div class="term-card fade-in-up">
+                    <div class="term-card-header">
+                        <span>👑</span>
+                        <h3>人物稱謂 Character Titles</h3>
+                    </div>
+                    <div class="term-list">
+                        <table class="term-table">
+                            <thead>
+                                <tr>
+                                    <th>English</th>
+                                    <th>繁體中文</th>
+                                    <th>使用場合</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="term-english">My Lord</td>
+                                    <td class="term-chinese">主公</td>
+                                    <td class="term-notes">部下對諸侯</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Your Majesty</td>
+                                    <td class="term-chinese">陛下</td>
+                                    <td class="term-notes">對皇帝</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">General</td>
+                                    <td class="term-chinese">將軍</td>
+                                    <td class="term-notes">軍職稱呼</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Prime Minister</td>
+                                    <td class="term-chinese">丞相</td>
+                                    <td class="term-notes">如曹操</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Brother</td>
+                                    <td class="term-chinese">兄長/賢弟</td>
+                                    <td class="term-notes">結義兄弟間</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Advisor</td>
+                                    <td class="term-chinese">軍師/先生</td>
+                                    <td class="term-notes">對謀士</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Traitor</td>
+                                    <td class="term-chinese">亂臣賊子</td>
+                                    <td class="term-notes">罵敵人</td>
+                                </tr>
+                                <tr>
+                                    <td class="term-english">Villain</td>
+                                    <td class="term-chinese">奸賊/逆賊</td>
+                                    <td class="term-notes">罵敵人</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Quiz -->
+    <section id="quiz" class="quiz-section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <div class="section-badge">📝 Interactive</div>
+                <h2 class="section-title">互動測驗</h2>
+                <p class="section-subtitle">Translation Quiz — 測試你的本地化功力！</p>
+            </div>
+
+            <div class="quiz-container fade-in-up">
+                <div class="quiz-card">
+                    <div class="quiz-progress">
+                        <span class="quiz-progress-text" id="progressText">題目 1/5</span>
+                        <div class="quiz-progress-bar">
+                            <div class="quiz-progress-fill" id="progressFill" style="width: 20%"></div>
+                        </div>
+                    </div>
+
+                    <div id="quizContent">
+                        <div class="quiz-question">
+                            <p class="quiz-question-label">英文原文 English Original:</p>
+                            <p class="quiz-question-text" id="questionText">"Hold the line!"</p>
+                        </div>
+
+                        <div class="quiz-options" id="optionsContainer">
+                            <!-- Options will be generated by JavaScript -->
+                        </div>
+
+                        <div class="quiz-feedback" id="feedbackBox">
+                            <p id="feedbackText"></p>
+                        </div>
+
+                        <div class="quiz-buttons">
+                            <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()">確認答案</button>
+                            <button class="btn btn-secondary" id="nextBtn" onclick="nextQuestion()" style="display: none;">下一題 →</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-result" id="quizResult">
+                        <div class="quiz-score" id="scoreDisplay">0/5</div>
+                        <p class="quiz-score-text" id="scoreText">你的本地化功力還需加強！</p>
+                        <button class="btn btn-primary" onclick="resetQuiz()">🔄 再試一次</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tips Section -->
+    <section id="tips" class="tips-section">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <div class="section-badge">💡 Tips</div>
+                <h2 class="section-title">實用技巧</h2>
+                <p class="section-subtitle">Localization Best Practices — 遊戲本地化專家的建議</p>
+            </div>
+
+            <div class="tips-grid">
+                <div class="tip-card fade-in-up">
+                    <div class="tip-icon">📖</div>
+                    <h3>熟讀歷史背景</h3>
+                    <p>了解三國時代的歷史、文化和語言風格。多讀《三國演義》、觀看相關影視作品，熟悉古風用語。</p>
+                </div>
+                <div class="tip-card fade-in-up">
+                    <div class="tip-icon">🎭</div>
+                    <h3>角色語域要分明</h3>
+                    <p>皇帝、將軍、謀士、士兵各有不同的說話方式。注意身份地位，讓對話符合角色性格。</p>
+                </div>
+                <div class="tip-card fade-in-up">
+                    <div class="tip-icon">⚔️</div>
+                    <h3>建立專業術語庫</h3>
+                    <p>整理軍事、政治、稱謂等專業術語，確保譯文一致性。避免同一個詞在不同地方用不同翻譯。</p>
+                </div>
+                <div class="tip-card fade-in-up">
+                    <div class="tip-icon">🔍</div>
+                    <h3>不要盲信機器翻譯</h3>
+                    <p>MT 是參考工具，不是最終答案。所有譯文都需要人工審核，特別是專業術語和口語表達。</p>
+                </div>
+                <div class="tip-card fade-in-up">
+                    <div class="tip-icon">🎮</div>
+                    <h3>實際遊玩測試</h3>
+                    <p>翻譯完成後，要在遊戲中實際體驗。確認文字長度適合UI、語氣符合場景、節奏配合遊戲流程。</p>
+                </div>
+                <div class="tip-card fade-in-up">
+                    <div class="tip-icon">🤝</div>
+                    <h3>與開發團隊溝通</h3>
+                    <p>遇到不確定的地方，及時與原文作者或開發團隊確認。了解設計意圖，才能翻譯出最佳效果。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">🎮 遊戲本地化工作坊</div>
+            <p class="footer-text">
+                Game Localization Lab: Total War - Three Kingdoms<br>
+                專業遊戲翻譯培訓課程 | Professional Game Translation Training
+            </p>
+            <div class="footer-links">
+                <a href="#errors">MT錯誤類型</a>
+                <a href="#terminology">術語庫</a>
+                <a href="#quiz">互動測驗</a>
+                <a href="#tips">實用技巧</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // NAVIGATION TOGGLE
+        // ============================================
+        document.getElementById('navToggle').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // ============================================
+        // SCROLL ANIMATIONS
+        // ============================================
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+
+        // ============================================
+        // QUIZ FUNCTIONALITY
+        // ============================================
+        const quizData = [
+            {
+                question: '"Hold the line!"',
+                options: [
+                    { text: '握住那條線！', correct: false },
+                    { text: '堅守陣地！', correct: true },
+                    { text: '拿住那條線！', correct: false },
+                    { text: '保持線路！', correct: false }
+                ],
+                explanation: '「Hold the line」是軍事命令，意思是「堅守陣地」，而不是字面上的「握住線」。'
+            },
+            {
+                question: '"Fire at will!"',
+                options: [
+                    { text: '向威爾開火！', correct: false },
+                    { text: '用火燒威爾！', correct: false },
+                    { text: '自由射擊！', correct: true },
+                    { text: '開火！威爾！', correct: false }
+                ],
+                explanation: '「Fire at will」中的 "will" 是「意願」的意思，整句是「按照自己的判斷射擊」= 自由射擊。'
+            },
+            {
+                question: '"Loose!" (對弓箭手說)',
+                options: [
+                    { text: '放鬆！', correct: false },
+                    { text: '鬆開！', correct: false },
+                    { text: '放箭！', correct: true },
+                    { text: '散開！', correct: false }
+                ],
+                explanation: '在軍事語境中，"Loose" 是對弓箭手的射箭命令，不是「放鬆」的意思。'
+            },
+            {
+                question: '皇帝應該如何稱呼？',
+                options: [
+                    { text: '總統大人', correct: false },
+                    { text: '老闆', correct: false },
+                    { text: '陛下', correct: true },
+                    { text: '先生', correct: false }
+                ],
+                explanation: '三國時代對皇帝的正確稱呼是「陛下」，這是古代對皇帝的尊稱。'
+            },
+            {
+                question: '"Rout the enemy!" 應該翻譯為？',
+                options: [
+                    { text: '路由敵人！', correct: false },
+                    { text: '擊潰敵軍！', correct: true },
+                    { text: '繞過敵人！', correct: false },
+                    { text: '追蹤敵人！', correct: false }
+                ],
+                explanation: '"Rout" 是「潰敗、擊潰」的意思，與網路的 "router" 完全無關！'
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        function initQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedOption = null;
+            showQuestion();
+            document.getElementById('quizResult').classList.remove('show');
+            document.getElementById('quizContent').style.display = 'block';
+        }
+
+        function showQuestion() {
+            const question = quizData[currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('progressText').textContent = `題目 ${currentQuestion + 1}/${quizData.length}`;
+            document.getElementById('progressFill').style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'quiz-option';
+                optionEl.textContent = option.text;
+                optionEl.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionEl);
+            });
+
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('feedbackBox').classList.remove('show');
+            selectedOption = null;
+        }
+
+        function selectOption(index) {
+            document.querySelectorAll('.quiz-option').forEach((opt, i) => {
+                opt.classList.remove('selected');
+                if (i === index) opt.classList.add('selected');
+            });
+            selectedOption = index;
+        }
+
+        function submitAnswer() {
+            if (selectedOption === null) {
+                alert('請選擇一個答案！');
+                return;
+            }
+
+            const question = quizData[currentQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            const feedbackBox = document.getElementById('feedbackBox');
+            const feedbackText = document.getElementById('feedbackText');
+
+            options.forEach((opt, i) => {
+                opt.onclick = null; // Disable clicking
+                if (question.options[i].correct) {
+                    opt.classList.add('correct');
+                } else if (i === selectedOption) {
+                    opt.classList.add('wrong');
+                }
+            });
+
+            if (question.options[selectedOption].correct) {
+                score++;
+                feedbackBox.className = 'quiz-feedback correct show';
+                feedbackText.textContent = '✅ 正確！' + question.explanation;
+            } else {
+                feedbackBox.className = 'quiz-feedback wrong show';
+                feedbackText.textContent = '❌ 錯誤！' + question.explanation;
+            }
+
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= quizData.length) {
+                showResult();
+            } else {
+                showQuestion();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quizContent').style.display = 'none';
+            document.getElementById('quizResult').classList.add('show');
+            document.getElementById('scoreDisplay').textContent = `${score}/${quizData.length}`;
+
+            let scoreText = '';
+            const percentage = (score / quizData.length) * 100;
+            if (percentage === 100) {
+                scoreText = '🏆 完美！你是專業的遊戲本地化專家！';
+            } else if (percentage >= 80) {
+                scoreText = '👍 優秀！你已經掌握了本地化的關鍵技巧！';
+            } else if (percentage >= 60) {
+                scoreText = '📚 不錯！繼續學習，你會更進步！';
+            } else {
+                scoreText = '💪 加油！多複習一下錯誤類型，你可以做到的！';
+            }
+            document.getElementById('scoreText').textContent = scoreText;
+        }
+
+        function resetQuiz() {
+            initQuiz();
+        }
+
+        // Initialize quiz on page load
+        initQuiz();
+    </script>
+</body>
+</html>
