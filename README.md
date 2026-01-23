@@ -10,13 +10,6 @@
   術語庫檢視器 | Import, View, Edit & Export Your Terminology
 </p>
 
-<p align="center">
-  <a href="https://digimarketingai.github.io/Termify/">🚀 Live Demo</a> •
-  <a href="#features">Features</a> •
-  <a href="#usage">Usage</a> •
-  <a href="#csv-format">CSV Format</a>
-</p>
-
 ---
 
 ## ✨ Features
