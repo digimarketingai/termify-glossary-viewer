@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termify v2 | Buddhist Glossary Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --secondary: #7b2cbf;
+            --bg-1: #1a1a2e;
+            --bg-2: #16213e;
+            --bg-3: #0f3460;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+            min-height: 100vh;
+            color: #e4e4e4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid var(--primary);
+            display: none;
+        }
+
+        .header-logo.visible {
+            display: inline-block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .developer-name {
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .developer-name.visible {
+            display: block;
+        }
+
+        .settings-panel {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .settings-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .settings-title::after {
+            content: '▼';
+            font-size: 0.8rem;
+            transition: transform 0.3s;
+        }
+
+        .settings-title.collapsed::after {
+            transform: rotate(-90deg);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .settings-grid.hidden {
+            display: none;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setting-group label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .setting-group input[type="text"],
+        .setting-group input[type="url"] {
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .setting-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-btn.active {
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .theme-btn.ocean { background: linear-gradient(135deg, #00d4ff, #7b2cbf); }
+        .theme-btn.sunset { background: linear-gradient(135deg, #f39c12, #e74c3c); }
+        .theme-btn.forest { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .theme-btn.midnight { background: linear-gradient(135deg, #2c3e50, #34495e); }
+        .theme-btn.cherry { background: linear-gradient(135deg, #e91e63, #9c27b0); }
+        .theme-btn.golden { background: linear-gradient(135deg, #f1c40f, #e67e22); }
+
+        .image-upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .image-upload-area img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .upload-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .upload-section.dragover {
+            border-color: var(--secondary);
+            background: rgba(123, 44, 191, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #aaa;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 25px;
+            border-radius: 30px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        .search-box::placeholder {
+            color: #888;
+        }
+
+        .search-box:focus {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: auto;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: rgba(0, 212, 255, 0.2);
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: rgba(0, 212, 255, 0.3);
+        }
+
+        th::after {
+            content: ' ↕';
+            opacity: 0.5;
+            font-size: 0.8rem;
+        }
+
+        th.no-sort {
+            cursor: default;
+        }
+
+        th.no-sort:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        th.no-sort::after {
+            content: '';
+        }
+
+        th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        tr {
+            cursor: pointer;
+        }
+
+        .term-with-image {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .term-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .term-image-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .source-term {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .target-term {
+            color: #e4e4e4;
+        }
+        
+        .chinese-term {
+            color: #d4a5ff;
+            font-weight: 500;
+        }
+
+        .id-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-family: monospace;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .export-html {
+            background: linear-gradient(90deg, #00d4ff, #0099cc);
+            color: white;
+        }
+
+        .export-csv {
+            background: linear-gradient(90deg, #7b2cbf, #5a189a);
+            color: white;
+        }
+
+        .export-json {
+            background: linear-gradient(90deg, #f39c12, #e74c3c);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #888;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            color: white;
+        }
+
+        .icon-btn.copied {
+            background: rgba(46, 204, 113, 0.3);
+            color: #2ecc71;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .add-term-btn {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .add-term-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 20px;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .modal-input:focus {
+            border-color: var(--primary);
+        }
+
+        .modal-label {
+            display: block;
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .modal-btn.delete {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Enlarge Modal - Full Entry View */
+        .enlarge-modal .modal-content {
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .enlarge-image-container {
+            width: 100%;
+            max-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .enlarge-image {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .enlarge-no-image {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            gap: 10px;
+        }
+
+        .enlarge-no-image-icon {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+
+        .enlarge-terms {
+            margin-bottom: 25px;
+        }
+
+        .enlarge-id {
+            font-family: monospace;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .enlarge-sanskrit {
+            font-size: 2.2rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .enlarge-english {
+            font-size: 1.5rem;
+            color: #e4e4e4;
+            margin-bottom: 10px;
+        }
+
+        .enlarge-chinese {
+            font-size: 1.5rem;
+            color: #d4a5ff;
+        }
+
+        .enlarge-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .enlarge-action-btn {
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .enlarge-action-btn.edit {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--primary);
+        }
+
+        .enlarge-action-btn.copy {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .enlarge-action-btn.close {
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        .enlarge-action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .controls { flex-direction: column; }
+            .search-box { width: 100%; }
+            th, td { padding: 12px 10px; }
+            .source-term { font-size: 1rem; }
+            .action-buttons { flex-direction: column; }
+            .action-btn { width: 100%; justify-content: center; }
+            .settings-grid { grid-template-columns: 1fr; }
+            .enlarge-sanskrit { font-size: 1.8rem; }
+            .enlarge-english, .enlarge-chinese { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img id="headerLogo" class="header-logo" src="" alt="Logo">
+            <h1 id="mainTitle">🔤 Termify v2</h1>
+            <p class="subtitle" id="mainSubtitle">Buddhist Glossary Viewer | 5-Column Format</p>
+            <p class="developer-name" id="developerDisplay">Developed by <span id="devName"></span></p>
+        </header>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel">
+            <div class="settings-title" id="settingsToggle" onclick="toggleSettings()">
+                ⚙️ Customization Settings 自訂設定
+            </div>
+            <div class="settings-grid" id="settingsGrid">
+                <div class="setting-group">
+                    <label>📝 Glossary Title 術語庫標題</label>
+                    <input type="text" id="glossaryTitle" placeholder="My Glossary 我的術語庫" oninput="updateTitle()">
+                </div>
+                <div class="setting-group">
+                    <label>📖 Subtitle 副標題</label>
+                    <input type="text" id="glossarySubtitle" placeholder="Optional subtitle 可選副標題" oninput="updateSubtitle()">
+                </div>
+                <div class="setting-group">
+                    <label>👤 Developer / Author 開發者 / 作者</label>
+                    <input type="text" id="developerName" placeholder="Your name 您的名稱" oninput="updateDeveloper()">
+                </div>
+                <div class="setting-group">
+                    <label>🎨 Theme Color 主題色調</label>
+                    <div class="theme-options">
+                        <button class="theme-btn ocean active" data-theme="ocean" onclick="setTheme('ocean')" title="Ocean 海洋"></button>
+                        <button class="theme-btn sunset" data-theme="sunset" onclick="setTheme('sunset')" title="Sunset 日落"></button>
+                        <button class="theme-btn forest" data-theme="forest" onclick="setTheme('forest')" title="Forest 森林"></button>
+                        <button class="theme-btn midnight" data-theme="midnight" onclick="setTheme('midnight')" title="Midnight 午夜"></button>
+                        <button class="theme-btn cherry" data-theme="cherry" onclick="setTheme('cherry')" title="Cherry 櫻桃"></button>
+                        <button class="theme-btn golden" data-theme="golden" onclick="setTheme('golden')" title="Golden 金色"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="uploadSection" class="upload-section">
+            <div class="upload-icon">📁</div>
+            <p class="upload-text">Drag & drop your CSV file here, or click to browse<br>拖放 CSV 檔案至此，或點擊選擇檔案</p>
+            <p class="upload-hint">
+                <strong>Required CSV Format (5 Columns):</strong><br>
+                Term ID | Sanskrit Term (IAST) | English Translation | Classical Chinese Translation | Media Link
+            </p>
+            <input type="file" id="fileInput" class="file-input" accept=".csv">
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                Choose File 選擇檔案
+            </button>
+        </div>
+
+        <div id="mainContent" class="hidden">
+            <div class="stats" id="stats"></div>
+
+            <div class="controls">
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search terms... 搜尋術語...">
+                <button class="add-term-btn" onclick="openAddModal()">➕ Add Term 新增術語</button>
+            </div>
+
+            <div class="table-container">
+                <table id="glossaryTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="id">Term ID</th>
+                            <th data-sort="sanskrit">Sanskrit (IAST)</th>
+                            <th data-sort="english">English Translation</th>
+                            <th data-sort="chinese">Classical Chinese</th>
+                            <th class="no-sort">Actions 操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-state-icon">🔍</div>
+                <p>No matching terms found<br>找不到符合的術語</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn export-html" onclick="exportHTML()">
+                    📄 Export Standalone HTML 匯出獨立網頁
+                </button>
+                <button class="action-btn export-csv" onclick="exportCSV()">
+                    📊 Export CSV 匯出 CSV
+                </button>
+                <button class="action-btn export-json" onclick="exportJSON()">
+                    💾 Export JSON 匯出 JSON
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            Powered by Termify v2 | Built for localizers & translators 為本地化與翻譯專業人士打造
+        </footer>
+    </div>
+
+    <!-- Add/Edit Term Modal -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">➕ Add New Term 新增術語</h3>
+            <label class="modal-label">Term ID</label>
+            <input type="text" class="modal-input" id="newId" placeholder="e.g. BUD-001">
+            
+            <label class="modal-label">Sanskrit Term (IAST) *</label>
+            <input type="text" class="modal-input" id="newSanskrit" placeholder="e.g. avalokiteśvara">
+            
+            <label class="modal-label">English Translation *</label>
+            <input type="text" class="modal-input" id="newEnglish" placeholder="e.g. enlightened beings">
+            
+            <label class="modal-label">Classical Chinese Translation</label>
+            <input type="text" class="modal-input" id="newChinese" placeholder="e.g. 菩薩">
+            
+            <label class="modal-label">Media Link (Image/Video URL)</label>
+            <input type="url" class="modal-input" id="newMediaUrl" placeholder="https://example.com/image.png">
+            
+            <div id="imagePreviewContainer" style="text-align: center; margin-bottom: 15px;">
+                <img id="modalImagePreview" src="" style="max-width: 100%; max-height: 150px; border-radius: 10px; display: none;">
+            </div>
+            <input type="hidden" id="editIndex" value="-1">
+            <div class="modal-buttons">
+                <button class="modal-btn delete" id="deleteBtn" onclick="deleteTerm()" style="display: none;">🗑️ Delete 刪除</button>
+                <button class="modal-btn cancel" onclick="closeAddModal()">Cancel 取消</button>
+                <button class="modal-btn confirm" onclick="saveTerm()">Save 儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enlarge Entry Modal -->
+    <div class="modal enlarge-modal" id="enlargeModal">
+        <div class="modal-content">
+            <div class="enlarge-image-container">
+                <img id="enlargeImage" class="enlarge-image" src="" alt="">
+                <div id="enlargeNoImage" class="enlarge-no-image">
+                    <div class="enlarge-no-image-icon">🖼️</div>
+                    <span>No media 無媒體</span>
+                </div>
+            </div>
+            <div class="enlarge-terms">
+                <div class="enlarge-id" id="enlargeId"></div>
+                <div class="enlarge-sanskrit" id="enlargeSanskrit"></div>
+                <div class="enlarge-english" id="enlargeEnglish"></div>
+                <div class="enlarge-chinese" id="enlargeChinese"></div>
+            </div>
+            <div class="enlarge-actions">
+                <button class="enlarge-action-btn edit" onclick="editFromEnlarge()">✏️ Edit 編輯</button>
+                <button class="enlarge-action-btn copy" onclick="copyFromEnlarge()">📋 Copy 複製</button>
+                <button class="enlarge-action-btn close" onclick="closeEnlargeModal()">✕ Close 關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let glossaryData = [];
+        let currentSort = { column: null, direction: 'asc' };
+        let currentTheme = 'ocean';
+        let logoDataUrl = '';
+        let currentEnlargeIndex = -1;
+
+        const themes = {
+            ocean: { primary: '#00d4ff', secondary: '#7b2cbf', bg1: '#1a1a2e', bg2: '#16213e', bg3: '#0f3460' },
+            sunset: { primary: '#f39c12', secondary: '#e74c3c', bg1: '#2c1810', bg2: '#3d2317', bg3: '#4a2c1a' },
+            forest: { primary: '#27ae60', secondary: '#2ecc71', bg1: '#1a2e1a', bg2: '#213e21', bg3: '#0f3d0f' },
+            midnight: { primary: '#9b59b6', secondary: '#3498db', bg1: '#1a1a2e', bg2: '#2c3e50', bg3: '#34495e' },
+            cherry: { primary: '#e91e63', secondary: '#9c27b0', bg1: '#2e1a2e', bg2: '#3e1640', bg3: '#4a0f3d' },
+            golden: { primary: '#f1c40f', secondary: '#e67e22', bg1: '#2e2a1a', bg2: '#3e3516', bg3: '#4a400f' }
+        };
+
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInput = document.getElementById('fileInput');
+        const mainContent = document.getElementById('mainContent');
+
+        function toggleSettings() {
+            var title = document.getElementById('settingsToggle');
+            var grid = document.getElementById('settingsGrid');
+            title.classList.toggle('collapsed');
+            grid.classList.toggle('hidden');
+        }
+
+        function setTheme(themeName) {
+            currentTheme = themeName;
+            var theme = themes[themeName];
+            document.documentElement.style.setProperty('--primary', theme.primary);
+            document.documentElement.style.setProperty('--secondary', theme.secondary);
+            document.documentElement.style.setProperty('--bg-1', theme.bg1);
+            document.documentElement.style.setProperty('--bg-2', theme.bg2);
+            document.documentElement.style.setProperty('--bg-3', theme.bg3);
+
+            document.querySelectorAll('.theme-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.theme-btn.' + themeName).classList.add('active');
+        }
+
+        function updateTitle() {
+            var title = document.getElementById('glossaryTitle').value;
+            document.getElementById('mainTitle').textContent = title || '🔤 Termify v2';
+        }
+
+        function updateSubtitle() {
+            var subtitle = document.getElementById('glossarySubtitle').value;
+            document.getElementById('mainSubtitle').textContent = subtitle || 'Buddhist Glossary Viewer | 5-Column Format';
+        }
+
+        function updateDeveloper() {
+            var dev = document.getElementById('developerName').value;
+            var display = document.getElementById('developerDisplay');
+            var nameSpan = document.getElementById('devName');
+            if (dev) {
+                nameSpan.textContent = dev;
+                display.classList.add('visible');
+            } else {
+                display.classList.remove('visible');
+            }
+        }
+
+        // File Upload
+        uploadSection.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', function() {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            var file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.csv')) {
+                processFile(file);
+            } else {
+                showToast('Please upload a CSV file 請上傳 CSV 檔案');
+            }
+        });
+
+        fileInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (file) processFile(file);
+        });
+
+        function processFile(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var content = e.target.result;
+                parseCSV(content);
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function parseCSV(content) {
+            var lines = content.trim().split('\n');
+            glossaryData = [];
+
+            for (var i = 1; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (!line) continue;
+
+                var matches = line.match(/("([^"]*)"|[^,]+)/g);
+                if (matches && matches.length >= 2) {
+                    var id = matches[0] ? matches[0].replace(/^"|"$/g, '').trim() : '';
+                    var sanskrit = matches[1] ? matches[1].replace(/^"|"$/g, '').trim() : '';
+                    var english = matches[2] ? matches[2].replace(/^"|"$/g, '').trim() : '';
+                    var chinese = matches[3] ? matches[3].replace(/^"|"$/g, '').trim() : '';
+                    var mediaUrl = matches[4] ? matches[4].replace(/^"|"$/g, '').trim() : '';
+
+                    if (sanskrit || english || chinese) {
+                        glossaryData.push({ id: id, sanskrit: sanskrit, english: english, chinese: chinese, mediaUrl: mediaUrl });
+                    }
+                }
+            }
+
+            if (glossaryData.length > 0) {
+                uploadSection.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                renderStats();
+                renderTable();
+                showToast('Loaded ' + glossaryData.length + ' terms 已載入 ' + glossaryData.length + ' 個術語');
+            } else {
+                showToast('No valid data found 找不到有效資料');
+            }
+        }
+
+        function renderStats() {
+            var statsContainer = document.getElementById('stats');
+            var withImages = glossaryData.filter(function(d) { return d.mediaUrl; }).length;
+            statsContainer.innerHTML = 
+                '<div class="stat-card"><div class="stat-number">' + glossaryData.length + '</div><div class="stat-label">Total Terms 總術語數</div></div>' +
+                '<div class="stat-card"><div class="stat-number">' + withImages + '</div><div class="stat-label">With Media 含媒體連結</div></div>';
+        }
+
+        function getFilteredData() {
+            var searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            var filtered = [];
+            for (var i = 0; i < glossaryData.length; i++) {
+                var item = glossaryData[i];
+                var matchesSearch = (item.id && item.id.toLowerCase().includes(searchTerm)) ||
+                                   (item.sanskrit && item.sanskrit.toLowerCase().includes(searchTerm)) ||
+                                   (item.english && item.english.toLowerCase().includes(searchTerm)) ||
+                                   (item.chinese && item.chinese.toLowerCase().includes(searchTerm));
+                if (matchesSearch) {
+                    filtered.push({ item: item, originalIndex: i });
+                }
+            }
+            return filtered;
+        }
+
+        function renderTable() {
+            var data = getFilteredData();
+
+            if (currentSort.column) {
+                data.sort(function(a, b) {
+                    var valA = (a.item[currentSort.column] || '').toLowerCase();
+                    var valB = (b.item[currentSort.column] || '').toLowerCase();
+                    var compare = valA.localeCompare(valB, 'zh-TW');
+                    return currentSort.direction === 'asc' ? compare : -compare;
+                });
+            }
+
+            var tbody = document.getElementById('tableBody');
+            var emptyState = document.getElementById('emptyState');
+
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            
+            var html = '';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i].item;
+                var origIndex = data[i].originalIndex;
+                
+                var imageHtml = '';
+                if (item.mediaUrl) {
+                    imageHtml = '<img src="' + escapeHtml(item.mediaUrl) + '" class="term-image" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="term-image-placeholder" style="display:none">📷</div>';
+                } else {
+                    imageHtml = '<div class="term-image-placeholder">📷</div>';
+                }
+                
+                html += '<tr onclick="openEnlargeModal(' + origIndex + ')" data-index="' + origIndex + '">' +
+                    '<td><span class="id-tag">' + escapeHtml(item.id || 'N/A') + '</span></td>' +
+                    '<td><div class="term-with-image">' + imageHtml + '<span class="source-term">' + escapeHtml(item.sanskrit) + '</span></div></td>' +
+                    '<td><span class="target-term">' + escapeHtml(item.english) + '</span></td>' +
+                    '<td><span class="chinese-term">' + escapeHtml(item.chinese) + '</span></td>' +
+                    '<td class="action-cell" onclick="event.stopPropagation()">' +
+                        '<button class="icon-btn" onclick="openEnlargeModal(' + origIndex + ')" title="Enlarge 放大">🔍</button>' +
+                        '<button class="icon-btn" onclick="openEditModal(' + origIndex + ')" title="Edit 編輯">✏️</button>' +
+                        '<button class="icon-btn" onclick="copyTermByIndex(' + origIndex + ', this)" title="Copy 複製">📋</button>' +
+                    '</td>' +
+                    '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById('searchBox').addEventListener('input', renderTable);
+
+        document.querySelectorAll('th[data-sort]').forEach(function(th) {
+            th.addEventListener('click', function() {
+                var column = th.dataset.sort;
+                if (currentSort.column === column) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.column = column;
+                    currentSort.direction = 'asc';
+                }
+
+                document.querySelectorAll('th').forEach(function(t) { 
+                    t.classList.remove('sort-asc', 'sort-desc'); 
+                });
+                th.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                renderTable();
+            });
+        });
+
+        // Copy Functions
+        function copyTermByIndex(index, btn) {
+            var item = glossaryData[index];
+            var text = item.sanskrit + ' | ' + item.english + ' | ' + item.chinese;
+            navigator.clipboard.writeText(text).then(function() {
+                btn.textContent = '✓';
+                btn.classList.add('copied');
+                showToast('Copied: ' + text);
+                setTimeout(function() {
+                    btn.textContent = '📋';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function copyFromEnlarge() {
+            if (currentEnlargeIndex >= 0) {
+                var item = glossaryData[currentEnlargeIndex];
+                var text = item.sanskrit + ' | ' + item.english + ' | ' + item.chinese;
+                navigator.clipboard.writeText(text).then(function() {
+                    showToast('Copied: ' + text);
+                });
+            }
+        }
+
+        // Toast
+        function showToast(message) {
+            var toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(function() { 
+                toast.classList.remove('show'); 
+            }, 3000);
+        }
+
+        // Add/Edit Modal
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = '➕ Add New Term 新增術語';
+            document.getElementById('newId').value = '';
+            document.getElementById('newSanskrit').value = '';
+            document.getElementById('newEnglish').value = '';
+            document.getElementById('newChinese').value = '';
+            document.getElementById('newMediaUrl').value = '';
+            document.getElementById('editIndex').value = '-1';
+            document.getElementById('deleteBtn').style.display = 'none';
+            document.getElementById('modalImagePreview').style.display = 'none';
+            document.getElementById('addModal').classList.add('show');
+        }
+
+        function openEditModal(index) {
+            var item = glossaryData[index];
+            document.getElementById('modalTitle').textContent = '✏️ Edit Term 編輯術語';
+            document.getElementById('newId').value = item.id || '';
+            document.getElementById('newSanskrit').value = item.sanskrit || '';
+            document.getElementById('newEnglish').value = item.english || '';
+            document.getElementById('newChinese').value = item.chinese || '';
+            document.getElementById('newMediaUrl').value = item.mediaUrl || '';
+            document.getElementById('editIndex').value = index;
+            document.getElementById('deleteBtn').style.display = 'inline-block';
+            
+            var preview = document.getElementById('modalImagePreview');
+            if (item.mediaUrl) {
+                preview.src = item.mediaUrl;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+            
+            document.getElementById('addModal').classList.add('show');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('show');
+        }
+
+        document.getElementById('newMediaUrl').addEventListener('input', function() {
+            var url = this.value;
+            var preview = document.getElementById('modalImagePreview');
+            if (url) {
+                preview.src = url;
+                preview.style.display = 'block';
+                preview.onerror = function() {
+                    preview.style.display = 'none';
+                };
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        function saveTerm() {
+            var id = document.getElementById('newId').value.trim();
+            var sanskrit = document.getElementById('newSanskrit').value.trim();
+            var english = document.getElementById('newEnglish').value.trim();
+            var chinese = document.getElementById('newChinese').value.trim();
+            var mediaUrl = document.getElementById('newMediaUrl').value.trim();
+            var editIndex = parseInt(document.getElementById('editIndex').value);
+
+            if (!sanskrit && !english && !chinese) {
+                showToast('Please enter at least one term value 請輸入至少一項術語');
+                return;
+            }
+
+            if (editIndex >= 0) {
+                glossaryData[editIndex] = { id: id, sanskrit: sanskrit, english: english, chinese: chinese, mediaUrl: mediaUrl };
+                showToast('Term updated successfully 術語更新成功');
+            } else {
+                glossaryData.push({ id: id, sanskrit: sanskrit, english: english, chinese: chinese, mediaUrl: mediaUrl });
+                showToast('Term added successfully 術語新增成功');
+            }
+
+            renderStats();
+            renderTable();
+            closeAddModal();
+
+            if (currentEnlargeIndex === editIndex && editIndex >= 0) {
+                updateEnlargeModal(editIndex);
+            }
+        }
+
+        function deleteTerm() {
+            var editIndex = parseInt(document.getElementById('editIndex').value);
+            if (editIndex >= 0) {
+                if (confirm('Are you sure you want to delete this term?\n確定要刪除此術語嗎？')) {
+                    glossaryData.splice(editIndex, 1);
+                    renderStats();
+                    renderTable();
+                    closeAddModal();
+                    closeEnlargeModal();
+                    showToast('Term deleted 術語已刪除');
+                }
+            }
+        }
+
+        // Enlarge Modal
+        function openEnlargeModal(index) {
+            currentEnlargeIndex = index;
+            updateEnlargeModal(index);
+            document.getElementById('enlargeModal').classList.add('show');
+        }
+
+        function updateEnlargeModal(index) {
+            var item = glossaryData[index];
+            var enlargeImage = document.getElementById('enlargeImage');
+            var enlargeNoImage = document.getElementById('enlargeNoImage');
+            
+            if (item.mediaUrl) {
+                enlargeImage.src = item.mediaUrl;
+                enlargeImage.style.display = 'block';
+                enlargeNoImage.style.display = 'none';
+                enlargeImage.onerror = function() {
+                    enlargeImage.style.display = 'none';
+                    enlargeNoImage.style.display = 'flex';
+                };
+            } else {
+                enlargeImage.style.display = 'none';
+                enlargeNoImage.style.display = 'flex';
+            }
+
+            document.getElementById('enlargeId').textContent = item.id ? 'ID: ' + item.id : '';
+            document.getElementById('enlargeSanskrit').textContent = item.sanskrit;
+            document.getElementById('enlargeEnglish').textContent = item.english;
+            document.getElementById('enlargeChinese').textContent = item.chinese;
+        }
+
+        function closeEnlargeModal() {
+            document.getElementById('enlargeModal').classList.remove('show');
+            currentEnlargeIndex = -1;
+        }
+
+        function editFromEnlarge() {
+            if (currentEnlargeIndex >= 0) {
+                closeEnlargeModal();
+                openEditModal(currentEnlargeIndex);
+            }
+        }
+
+        // Close modals on backdrop click
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddModal();
+        });
+
+        document.getElementById('enlargeModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEnlargeModal();
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAddModal();
+                closeEnlargeModal();
+            }
+            
+            if (document.getElementById('enlargeModal').classList.contains('show')) {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentEnlargeIndex > 0) {
+                        currentEnlargeIndex--;
+                        updateEnlargeModal(currentEnlargeIndex);
+                    }
+                } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (currentEnlargeIndex < glossaryData.length - 1) {
+                        currentEnlargeIndex++;
+                        updateEnlargeModal(currentEnlargeIndex);
+                    }
+                }
+            }
+        });
+
+        // Export Functions
+        function exportCSV() {
+            var data = getFilteredData();
+            var csv = 'Term ID,Sanskrit Term (IAST),English Translation,Classical Chinese Translation,Media Link (Image/Video URL)\n';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i].item;
+                csv += '"' + (item.id || '').replace(/"/g, '""') + '","' + (item.sanskrit || '').replace(/"/g, '""') + '","' + (item.english || '').replace(/"/g, '""') + '","' + (item.chinese || '').replace(/"/g, '""') + '","' + (item.mediaUrl || '') + '"\n';
+            }
+            downloadFile(csv, 'termify_v2_glossary.csv', 'text/csv');
+            showToast('CSV exported successfully CSV 匯出成功');
+        }
+
+        function exportJSON() {
+            var data = getFilteredData();
+            var terms = [];
+            for (var i = 0; i < data.length; i++) {
+                terms.push(data[i].item);
+            }
+            var exportData = {
+                title: document.getElementById('glossaryTitle').value || 'Termify v2 Glossary',
+                subtitle: document.getElementById('glossarySubtitle').value || '',
+                developer: document.getElementById('developerName').value || '',
+                theme: currentTheme,
+                terms: terms
+            };
+            var json = JSON.stringify(exportData, null, 2);
+            downloadFile(json, 'termify_v2_glossary.json', 'application/json');
+            showToast('JSON exported successfully JSON 匯出成功');
+        }
+
+        function exportHTML() {
+            var data = getFilteredData();
+            var terms = [];
+            for (var i = 0; i < data.length; i++) {
+                terms.push(data[i].item);
+            }
+            var html = generateStandaloneHTML(terms);
+            downloadFile(html, 'termify_v2_glossary.html', 'text/html');
+            showToast('HTML exported - Ready to host! HTML 匯出完成');
+        }
+
+        function generateStandaloneHTML(data) {
+            var theme = themes[currentTheme];
+            var title = document.getElementById('glossaryTitle').value || 'Termify v2 Glossary';
+            var subtitle = document.getElementById('glossarySubtitle').value || '';
+            var developer = document.getElementById('developerName').value || '';
+            var today = new Date().toLocaleDateString();
+
+            var tableRows = '';
+            var termsJson = JSON.stringify(data);
+            
+            for (var i = 0; i < data.length; i++) {
+                var imgHtml = '';
+                if (data[i].mediaUrl) {
+                    imgHtml = '<img src="' + escapeHtml(data[i].mediaUrl) + '" class="term-img" onerror="this.style.display=\'none\'">';
+                }
+                tableRows += '<tr onclick="openEnlarge(' + i + ')" data-index="' + i + '"><td><span class="id-tag">' + escapeHtml(data[i].id || 'N/A') + '</span></td><td class="source">' + imgHtml + '<span>' + escapeHtml(data[i].sanskrit) + '</span></td><td class="target">' + escapeHtml(data[i].english) + '</td><td class="chinese">' + escapeHtml(data[i].chinese) + '</td></tr>';
+            }
+
+            var devHtml = developer ? '<p class="developer">Developed by ' + escapeHtml(developer) + '</p>' : '';
+            var subtitleHtml = subtitle ? '<p class="subtitle">' + escapeHtml(subtitle) + '</p>' : '';
+
+            return '<!DOCTYPE html>\n' +
+'<html lang="en">\n' +
+'<head>\n' +
+'    <meta charset="UTF-8">\n' +
+'    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+'    <title>' + escapeHtml(title) + '</title>\n' +
+'    <style>\n' +
+'        :root { --primary: ' + theme.primary + '; --secondary: ' + theme.secondary + '; }\n' +
+'        * { margin: 0; padding: 0; box-sizing: border-box; }\n' +
+'        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: linear-gradient(135deg, ' + theme.bg1 + ', ' + theme.bg2 + ', ' + theme.bg3 + '); min-height: 100vh; color: #e4e4e4; padding: 20px; }\n' +
+'        .container { max-width: 1000px; margin: 0 auto; }\n' +
+'        header { text-align: center; padding: 40px 20px; background: rgba(255,255,255,0.05); border-radius: 20px; margin-bottom: 30px; }\n' +
+'        h1 { font-size: 2rem; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }\n' +
+'        .subtitle { color: #aaa; margin-bottom: 10px; }\n' +
+'        .developer { color: var(--primary); font-size: 0.9rem; }\n' +
+'        .stats { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-bottom: 20px; }\n' +
+'        .stat { text-align: center; }\n' +
+'        .stat-num { font-size: 1.5rem; font-weight: bold; color: var(--primary); }\n' +
+'        .stat-label { color: #888; font-size: 0.9rem; }\n' +
+'        .search { width: 100%; max-width: 400px; padding: 12px 20px; border-radius: 25px; border: none; background: rgba(255,255,255,0.1); color: white; font-size: 1rem; margin-bottom: 20px; outline: none; }\n' +
+'        .search::placeholder { color: #888; }\n' +
+'        table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; }\n' +
+'        th { background: rgba(0,212,255,0.2); padding: 15px; text-align: left; }\n' +
+'        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }\n' +
+'        tr { cursor: pointer; transition: background 0.3s; }\n' +
+'        tr:hover td { background: rgba(255,255,255,0.05); }\n' +
+'        .source { color: var(--primary); font-size: 1.1rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }\n' +
+'        .term-img { width: 35px; height: 35px; border-radius: 6px; object-fit: cover; }\n' +
+'        .target { color: #e4e4e4; }\n' +
+'        .chinese { color: #d4a5ff; font-weight: 500; }\n' +
+'        .id-tag { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; background: rgba(255,255,255,0.1); color: #aaa; font-family: monospace; }\n' +
+'        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }\n' +
+'        .modal.show { display: flex; }\n' +
+'        .modal-content { background: linear-gradient(135deg, #1a1a2e, #16213e); border-radius: 20px; padding: 30px; max-width: 500px; width: 100%; text-align: center; }\n' +
+'        .modal-img-container { width: 100%; max-height: 250px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden; min-height: 100px; }\n' +
+'        .modal-img { max-width: 100%; max-height: 250px; object-fit: contain; }\n' +
+'        .modal-sanskrit { font-size: 2rem; font-weight: bold; background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }\n' +
+'        .modal-english { font-size: 1.5rem; color: #e4e4e4; margin-bottom: 10px; }\n' +
+'        .modal-chinese { font-size: 1.5rem; color: #d4a5ff; margin-bottom: 15px; }\n' +
+'        .modal-close { margin-top: 20px; padding: 10px 25px; border-radius: 20px; border: none; background: rgba(255,255,255,0.1); color: #aaa; cursor: pointer; }\n' +
+'        .modal-close:hover { background: rgba(255,255,255,0.2); }\n' +
+'        .no-img { color: #666; font-size: 3rem; }\n' +
+'        footer { text-align: center; padding: 30px; color: #666; font-size: 0.9rem; }\n' +
+'        @media (max-width: 600px) { th, td { padding: 10px 8px; } .source { font-size: 1rem; } .modal-sanskrit { font-size: 1.5rem; } .modal-english, .modal-chinese { font-size: 1.2rem; } }\n' +
+'    </style>\n' +
+'</head>\n' +
+'<body>\n' +
+'    <div class="container">\n' +
+'        <header>\n' +
+'            <h1>' + escapeHtml(title) + '</h1>\n' +
+'            ' + subtitleHtml + '\n' +
+'            ' + devHtml + '\n' +
+'            <div class="stats">\n' +
+'                <div class="stat"><div class="stat-num">' + data.length + '</div><div class="stat-label">Total Terms</div></div>\n' +
+'            </div>\n' +
+'            <input type="text" class="search" id="search" placeholder="🔍 Search... 搜尋...">\n' +
+'        </header>\n' +
+'        <div style="overflow-x: auto;">\n' +
+'        <table>\n' +
+'            <thead><tr><th>Term ID</th><th>Sanskrit (IAST)</th><th>English Translation</th><th>Classical Chinese</th></tr></thead>\n' +
+'            <tbody id="tbody">' + tableRows + '</tbody>\n' +
+'        </table>\n' +
+'        </div>\n' +
+'        <footer>Generated by Termify v2 | ' + today + '</footer>\n' +
+'    </div>\n' +
+'    <div class="modal" id="modal">\n' +
+'        <div class="modal-content">\n' +
+'            <div class="modal-img-container"><img id="modalImg" class="modal-img" src=""><div id="noImg" class="no-img">🖼️</div></div>\n' +
+'            <div class="modal-sanskrit" id="modalSanskrit"></div>\n' +
+'            <div class="modal-english" id="modalEnglish"></div>\n' +
+'            <div class="modal-chinese" id="modalChinese"></div>\n' +
+'            <button class="modal-close" onclick="closeModal()">Close 關閉</button>\n' +
+'        </div>\n' +
+'    </div>\n' +
+'    <script>\n' +
+'        var terms = ' + termsJson + ';\n' +
+'        var currentIdx = -1;\n' +
+'        document.getElementById("search").addEventListener("input", function() {\n' +
+'            var term = this.value.toLowerCase();\n' +
+'            var rows = document.querySelectorAll("#tbody tr");\n' +
+'            for (var i = 0; i < rows.length; i++) {\n' +
+'                var text = rows[i].textContent.toLowerCase();\n' +
+'                rows[i].style.display = text.includes(term) ? "" : "none";\n' +
+'            }\n' +
+'        });\n' +
+'        function openEnlarge(idx) {\n' +
+'            currentIdx = idx;\n' +
+'            var t = terms[idx];\n' +
+'            var img = document.getElementById("modalImg");\n' +
+'            var noImg = document.getElementById("noImg");\n' +
+'            if (t.mediaUrl) { img.src = t.mediaUrl; img.style.display = "block"; noImg.style.display = "none"; img.onerror = function() { img.style.display = "none"; noImg.style.display = "block"; }; }\n' +
+'            else { img.style.display = "none"; noImg.style.display = "block"; }\n' +
+'            document.getElementById("modalSanskrit").textContent = t.sanskrit;\n' +
+'            document.getElementById("modalEnglish").textContent = t.english;\n' +
+'            document.getElementById("modalChinese").textContent = t.chinese;\n' +
+'            document.getElementById("modal").classList.add("show");\n' +
+'        }\n' +
+'        function closeModal() { document.getElementById("modal").classList.remove("show"); currentIdx = -1; }\n' +
+'        document.getElementById("modal").onclick = function(e) { if (e.target === this) closeModal(); };\n' +
+'        document.onkeydown = function(e) {\n' +
+'            if (e.key === "Escape") closeModal();\n' +
+'            if (document.getElementById("modal").classList.contains("show")) {\n' +
+'                if (e.key === "ArrowLeft" && currentIdx > 0) { currentIdx--; openEnlarge(currentIdx); }\n' +
+'                if (e.key === "ArrowRight" && currentIdx < terms.length - 1) { currentIdx++; openEnlarge(currentIdx); }\n' +
+'            }\n' +
+'        };\n' +
+'    <\/script>\n' +
+'</body>\n' +
+'</html>';
+        }
+
+        function downloadFile(content, filename, type) {
+            var blob = new Blob([content], { type: type + ';charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
